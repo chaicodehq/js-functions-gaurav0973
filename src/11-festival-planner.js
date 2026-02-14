@@ -49,5 +49,93 @@
  *   mgr.getUpcoming("2025-01-01", 1); // => [{ name: "Republic Day", ... }]
  */
 export function createFestivalManager() {
-  // Your code here
+  let festivals = [];
+
+  const validTypes = new Set(["religious", "national", "cultural"]);
+
+  function isValidDateStr(d) {
+    return typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d);
+  }
+
+  function addFestival(name, date, type) {
+    if (
+      !name ||
+      typeof name !== "string" ||
+      !isValidDateStr(date) ||
+      !validTypes.has(type)
+    ) {
+      return -1;
+    }
+
+    for (let i = 0; i < festivals.length; i++) {
+      if (festivals[i].name === name) return -1;
+    }
+
+    festivals.push({ name, date, type });
+    return festivals.length;
+  }
+
+  function removeFestival(name) {
+    for (let i = 0; i < festivals.length; i++) {
+      if (festivals[i].name === name) {
+        festivals = [
+          ...festivals.slice(0, i),
+          ...festivals.slice(i + 1)
+        ];
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function getAll() {
+    const copy = [];
+    for (let i = 0; i < festivals.length; i++) {
+      const f = festivals[i];
+      copy.push({ name: f.name, date: f.date, type: f.type });
+    }
+    return copy;
+  }
+
+  function getByType(type) {
+    const res = [];
+    for (let i = 0; i < festivals.length; i++) {
+      if (festivals[i].type === type) {
+        const f = festivals[i];
+        res.push({ name: f.name, date: f.date, type: f.type });
+      }
+    }
+    return res;
+  }
+
+  function getUpcoming(currentDate, n = 3) {
+    if (!isValidDateStr(currentDate)) return [];
+
+    const filtered = [];
+
+    for (let i = 0; i < festivals.length; i++) {
+      if (festivals[i].date >= currentDate) {
+        const f = festivals[i];
+        filtered.push({ name: f.name, date: f.date, type: f.type });
+      }
+    }
+
+    filtered.sort((a, b) => a.date.localeCompare(b.date));
+
+    return filtered.slice(0, n);
+  }
+
+  function getCount() {
+    return festivals.length;
+  }
+
+  return {
+    addFestival,
+    removeFestival,
+    getAll,
+    getByType,
+    getUpcoming,
+    getCount
+  };
 }
+

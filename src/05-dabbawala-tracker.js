@@ -49,5 +49,84 @@
  *   // => { name: "Ram", area: "Dadar", total: 2, completed: 1, pending: 1, successRate: "50.00%" }
  */
 export function createDabbawala(name, area) {
-  // Your code here
+  let deliveries = [];
+  let nextId = 1;
+
+  function addDelivery(from, to) {
+    if (!from || !to) return -1;
+
+    const delivery = {
+      id: nextId++,
+      from,
+      to,
+      status: "pending"
+    };
+
+    deliveries.push(delivery);
+    return delivery.id;
+  }
+
+  function completeDelivery(id) {
+    for (let i = 0; i < deliveries.length; i++) {
+      const d = deliveries[i];
+
+      if (d.id === id) {
+        if (d.status === "completed") return false;
+
+        d.status = "completed";
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function getActiveDeliveries() {
+    const result = [];
+
+    for (let i = 0; i < deliveries.length; i++) {
+      if (deliveries[i].status === "pending") {
+        result.push({ ...deliveries[i] });
+      }
+    }
+
+    return result;
+  }
+
+  function getStats() {
+    const total = deliveries.length;
+    let completed = 0;
+
+    for (let i = 0; i < deliveries.length; i++) {
+      if (deliveries[i].status === "completed") completed++;
+    }
+
+    const pending = total - completed;
+
+    let successRate = "0.00%";
+    if (total > 0) {
+      successRate = ((completed / total) * 100).toFixed(2) + "%";
+    }
+
+    return {
+      name,
+      area,
+      total,
+      completed,
+      pending,
+      successRate
+    };
+  }
+
+  function reset() {
+    deliveries = [];
+    nextId = 1;
+    return true;
+  }
+  return {
+    addDelivery,
+    completeDelivery,
+    getActiveDeliveries,
+    getStats,
+    reset
+  };
 }
